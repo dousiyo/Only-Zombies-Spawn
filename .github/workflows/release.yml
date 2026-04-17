@@ -32,9 +32,9 @@ jobs:
       - name: Read version
         id: version
         run: |
-          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=forge-1.20.1-v$VERSION" >> "$GITHUB_OUTPUT"
+              VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d '\r')
+              echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+              echo "tag=forge-1.20.1-v$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build
         run: ./gradlew build
