@@ -5,15 +5,18 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 
-version = mod_version
 group = mod_group_id
-
-repositories {
-    mavenLocal()
-}
+version = mod_version
 
 base {
     archivesName = mod_id
+}
+
+tasks.withType(Jar).configureEach {
+    archiveFileName = "${mod_id}-${loader_name}-${minecraft_version}-${mod_version}.jar"
+}
+repositories {
+    mavenLocal()
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
