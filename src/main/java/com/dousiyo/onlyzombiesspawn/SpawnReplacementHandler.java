@@ -3,11 +3,11 @@ package com.dousiyo.onlyzombiesspawn;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 
@@ -17,7 +17,7 @@ final class SpawnReplacementHandler {
 
     static void onFinalizeSpawn(FinalizeSpawnEvent event) {
         Mob mob = event.getEntity();
-        MobSpawnType spawnType = event.getSpawnType();
+        EntitySpawnReason spawnType = event.getSpawnType();
         if (!SpawnRestrictionRules.shouldReplace(mob, spawnType)) {
             return;
         }
@@ -37,7 +37,7 @@ final class SpawnReplacementHandler {
             return;
         }
 
-        MobSpawnType spawnType = mob.getSpawnType();
+        EntitySpawnReason spawnType = mob.getSpawnType();
         if (spawnType == null || !SpawnRestrictionRules.shouldReplace(mob, spawnType)) {
             return;
         }
@@ -46,14 +46,14 @@ final class SpawnReplacementHandler {
         spawnZombieReplacement((ServerLevel) event.getLevel(), mob, spawnType, ((ServerLevel) event.getLevel()).getCurrentDifficultyAt(mob.blockPosition()));
     }
 
-    private static void spawnZombieReplacement(ServerLevelAccessor level, Mob source, MobSpawnType spawnType, DifficultyInstance difficulty) {
-        Zombie zombie = EntityType.ZOMBIE.create(level.getLevel());
+    private static void spawnZombieReplacement(ServerLevelAccessor level, Mob source, EntitySpawnReason spawnType, DifficultyInstance difficulty) {
+        Zombie zombie = EntityType.ZOMBIE.create(level.getLevel(), spawnType);
         if (zombie == null) {
             OnlyZombiesSpawn.LOGGER.warn("Failed to create zombie replacement for {}", source.getType());
             return;
         }
 
-        zombie.moveTo(source.getX(), source.getY(), source.getZ(), source.getYRot(), source.getXRot());
+        zombie.snapTo(source.getX(), source.getY(), source.getZ(), source.getYRot(), source.getXRot());
         if (source.isPersistenceRequired()) {
             zombie.setPersistenceRequired();
         }
