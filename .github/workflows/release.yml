@@ -7,7 +7,7 @@ on:
       - forge/1.20.1
       - neoforge/1.21.1
       - neoforge/26.1
-      -
+
 permissions:
   contents: write
 
@@ -31,6 +31,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: ./gradlew build
 
@@ -40,19 +47,11 @@ jobs:
           name: build-jars
           path: build/libs/*.jar
 
-      - name: Generate tag and release name
-        id: meta
-        run: |
-          TAG="auto-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
-          NAME="Auto Release ${GITHUB_RUN_NUMBER}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.meta.outputs.tag }}" \
+          gh release create "${{ steps.version.outputs.tag }}" \
             build/libs/*.jar \
-            --title "${{ steps.meta.outputs.name }}" \
+            --title "${{ steps.version.outputs.tag }}" \
             --generate-notes
