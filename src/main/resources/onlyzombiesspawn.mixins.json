@@ -1,9 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.dousiyo.temple.mixin",
+  "package": "com.dousiyo.onlyzombiesspawn.mixin",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "temple.refmap.json",
+  "refmap": "onlyzombiesspawn.refmap.json",
   "mixins": [
   ],
   "client": [
