@@ -1,33 +1,24 @@
 {
 	"schemaVersion": 1,
-	"id": "template-mod",
+	"id": "onlyzombiesspawn",
 	"version": "${version}",
-	"name": "Template Mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Only Zombies Spawn",
+	"description": "自然スポーンとスポナー由来の敵対Mobを通常ゾンビへ統一します。",
 	"authors": [
-		"Me!"
+		"dousiyo"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://fabricmc.net/"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/template-mod/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.dousiyo.TemplateMod"
-		],
-		"client": [
-			"com.dousiyo.client.TemplateModClient"
+			"com.dousiyo.onlyzombiesspawn.OnlyZombiesSpawn"
 		]
 	},
 	"mixins": [
-		"template-mod.mixins.json",
-		{
-			"config": "template-mod.client.mixins.json",
-			"environment": "client"
-		}
+		"onlyzombiesspawn.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.2",

@@ -18,7 +18,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"template-mod" {
+		"onlyzombiesspawn" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
