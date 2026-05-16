@@ -17,6 +17,7 @@ val modCredits: String by project
 val modFabricEntrypoint: String by project
 val modFabricClientEntrypoint: String by project
 val minecraftVersion: String by project
+val fabricMinecraftVersionRange = project.properties["fabricMinecraftVersionRange"]?.toString()
 val loaderVersion: String by project
 val javaVersion: String by project
 
@@ -37,7 +38,7 @@ sourceSets.main.get().resources.srcDir(generatedModMetadataDir)
 
 val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata") {
     val replaceProperties = mapOf(
-        "minecraft_version" to JsonOutput.toJson("~$minecraftVersion"),
+        "minecraft_version" to JsonOutput.toJson(fabricMinecraftVersionRange ?: "~$minecraftVersion"),
         "loader_version" to JsonOutput.toJson(">=$loaderVersion"),
         "mod_id" to JsonOutput.toJson(modId),
         "mod_name" to JsonOutput.toJson(modName),

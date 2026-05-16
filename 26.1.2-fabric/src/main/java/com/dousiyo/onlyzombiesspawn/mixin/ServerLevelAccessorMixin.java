@@ -1,6 +1,7 @@
 package com.dousiyo.onlyzombiesspawn.mixin;
 
 import com.dousiyo.onlyzombiesspawn.OnlyZombiesSpawnLogic;
+import com.dousiyo.onlyzombiesspawn.SpawnWhitelistConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,6 +21,12 @@ public interface ServerLevelAccessorMixin {
 
         if (replacement != null) {
             accessor.addFreshEntityWithPassengers(replacement);
+            for (int i = 1; i < SpawnWhitelistConfig.zombieSpawnMultiplier(); i++) {
+                Entity extraReplacement = OnlyZombiesSpawnLogic.createReplacementIfNeeded(accessor.getLevel(), entity);
+                if (extraReplacement != null && extraReplacement != entity) {
+                    accessor.addFreshEntityWithPassengers(extraReplacement);
+                }
+            }
         }
 
         ci.cancel();

@@ -7,7 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,11 +19,20 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ServerLevelAccessor;
 
 public final class SpawnWhitelistConfig {
+    private static final String CONFIG_COMMENT = """
+            Only Zombies Spawn config
+            allowedMobs: Comma-separated mob IDs that are allowed to spawn even when they are not zombies. Example: minecraft:skeleton,minecraft:creeper
+            disabledDimensions: Comma-separated dimension IDs where zombie-only spawn replacement is disabled. Example: minecraft:the_nether
+            zombieSpawnMultiplier: Number of zombies to spawn for each replaced hostile mob. Minimum: 1. Maximum: 40.
+            """;
     private static final String FILE_NAME = "onlyzombiesspawn.properties";
     private static final String ALLOWED_MOBS = "allowedMobs";
     private static final String DISABLED_DIMENSIONS = "disabledDimensions";
+    private static final String ZOMBIE_SPAWN_MULTIPLIER = "zombieSpawnMultiplier";
+    private static final int MAX_ZOMBIE_SPAWN_MULTIPLIER = 40;
     private static final Set<ResourceLocation> allowedMobs = new HashSet<>();
     private static final Set<ResourceLocation> disabledDimensions = new HashSet<>();
+    private static int zombieSpawnMultiplier = 1;
 
     private SpawnWhitelistConfig() {
     }
@@ -42,6 +53,7 @@ public final class SpawnWhitelistConfig {
         disabledDimensions.clear();
         allowedMobs.addAll(parseResourceLocations(properties.getProperty(ALLOWED_MOBS, "")));
         disabledDimensions.addAll(parseResourceLocations(properties.getProperty(DISABLED_DIMENSIONS, "")));
+        zombieSpawnMultiplier = parseMultiplier(properties.getProperty(ZOMBIE_SPAWN_MULTIPLIER, "1"));
     }
 
     public static boolean isMobAllowed(EntityType<?> entityType) {
@@ -50,6 +62,35 @@ public final class SpawnWhitelistConfig {
 
     public static boolean isDimensionDisabled(ServerLevelAccessor level) {
         return disabledDimensions.contains(level.getLevel().dimension().location());
+    }
+
+    public static Set<String> allowedMobIds() {
+        return toSortedStrings(allowedMobs);
+    }
+
+    public static Set<String> disabledDimensionIds() {
+        return toSortedStrings(disabledDimensions);
+    }
+
+    public static int zombieSpawnMultiplier() {
+        return zombieSpawnMultiplier;
+    }
+
+    public static void save(Path configDirectory, Set<String> allowedMobIds, Set<String> disabledDimensionIds, int savedZombieSpawnMultiplier) {
+        Path configPath = configDirectory.resolve(FILE_NAME);
+        try {
+            Files.createDirectories(configPath.getParent());
+            Properties properties = new Properties();
+            properties.setProperty(ALLOWED_MOBS, String.join(",", allowedMobIds));
+            properties.setProperty(DISABLED_DIMENSIONS, String.join(",", disabledDimensionIds));
+            properties.setProperty(ZOMBIE_SPAWN_MULTIPLIER, Integer.toString(Math.min(MAX_ZOMBIE_SPAWN_MULTIPLIER, Math.max(1, savedZombieSpawnMultiplier))));
+            try (Writer writer = Files.newBufferedWriter(configPath, StandardCharsets.UTF_8)) {
+                properties.store(writer, CONFIG_COMMENT);
+            }
+            load(configDirectory);
+        } catch (IOException exception) {
+            Constants.LOGGER.warn("Failed to save {}", configPath, exception);
+        }
     }
 
     private static void createDefaultConfig(Path configPath) {
@@ -62,8 +103,9 @@ public final class SpawnWhitelistConfig {
             Properties defaults = new Properties();
             defaults.setProperty(ALLOWED_MOBS, "");
             defaults.setProperty(DISABLED_DIMENSIONS, "");
+            defaults.setProperty(ZOMBIE_SPAWN_MULTIPLIER, "1");
             try (Writer writer = Files.newBufferedWriter(configPath, StandardCharsets.UTF_8)) {
-                defaults.store(writer, "Only Zombies Spawn whitelist config");
+                defaults.store(writer, CONFIG_COMMENT);
             }
         } catch (IOException exception) {
             Constants.LOGGER.warn("Failed to create {}", configPath, exception);
@@ -77,5 +119,25 @@ public final class SpawnWhitelistConfig {
                 .map(ResourceLocation::tryParse)
                 .filter(location -> location != null)
                 .collect(Collectors.toSet());
+    }
+
+    private static Set<String> toSortedStrings(Set<ResourceLocation> identifiers) {
+        LinkedHashSet<String> values = identifiers.stream()
+                .map(ResourceLocation::toString)
+                .sorted()
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return Collections.unmodifiableSet(values);
+    }
+
+    private static int parseMultiplier(String value) {
+        try {
+            long parsed = Long.parseLong(value.trim());
+            if (parsed < 1L) {
+                return 1;
+            }
+            return parsed > MAX_ZOMBIE_SPAWN_MULTIPLIER ? MAX_ZOMBIE_SPAWN_MULTIPLIER : (int) parsed;
+        } catch (NumberFormatException exception) {
+            return 1;
+        }
     }
 }

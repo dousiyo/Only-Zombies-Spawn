@@ -14,9 +14,16 @@ final class SpawnReplacementHandler {
             return;
         }
 
+        event.setSpawnCancelled(true);
+        for (int i = 0; i < SpawnWhitelistConfig.zombieSpawnMultiplier(); i++) {
+            spawnZombie(event);
+        }
+    }
+
+    private static void spawnZombie(MobSpawnEvent.FinalizeSpawn event) {
+        Mob originalMob = event.getEntity();
         Zombie zombie = EntityType.ZOMBIE.create(event.getLevel().getLevel());
         if (zombie == null) {
-            event.setSpawnCancelled(true);
             Constants.LOGGER.warn("Failed to create replacement zombie for {}", originalMob.getType());
             return;
         }
@@ -25,8 +32,6 @@ final class SpawnReplacementHandler {
         zombie.setBaby(false);
         zombie.finalizeSpawn(event.getLevel(), event.getDifficulty(), event.getSpawnType(), null, null);
         zombie.setBaby(false);
-
-        event.setSpawnCancelled(true);
         event.getLevel().addFreshEntityWithPassengers(zombie);
     }
 }

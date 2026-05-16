@@ -24,7 +24,7 @@ final class SpawnReplacementHandler {
 
         event.setCanceled(true);
         event.setSpawnCancelled(true);
-        spawnZombieReplacement(event.getLevel(), mob, spawnType, event.getDifficulty());
+        spawnZombieReplacements(event.getLevel(), mob, spawnType, event.getDifficulty());
     }
 
     static void onEntityJoinLevel(EntityJoinLevelEvent event) {
@@ -44,7 +44,13 @@ final class SpawnReplacementHandler {
 
         ServerLevel level = (ServerLevel) event.getLevel();
         event.setCanceled(true);
-        spawnZombieReplacement(level, mob, spawnType, level.getCurrentDifficultyAt(mob.blockPosition()));
+        spawnZombieReplacements(level, mob, spawnType, level.getCurrentDifficultyAt(mob.blockPosition()));
+    }
+
+    private static void spawnZombieReplacements(ServerLevelAccessor level, Mob source, MobSpawnType spawnType, DifficultyInstance difficulty) {
+        for (int i = 0; i < SpawnWhitelistConfig.zombieSpawnMultiplier(); i++) {
+            spawnZombieReplacement(level, source, spawnType, difficulty);
+        }
     }
 
     private static void spawnZombieReplacement(ServerLevelAccessor level, Mob source, MobSpawnType spawnType, DifficultyInstance difficulty) {
