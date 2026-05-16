@@ -23,6 +23,9 @@
       ${mod_client_entrypoint}
     ]
   },
+  "mixins": [
+    ${mod_mixin_config}
+  ],
   "depends": {
     "fabricloader": ${loader_version},
     "minecraft": ${minecraft_version},

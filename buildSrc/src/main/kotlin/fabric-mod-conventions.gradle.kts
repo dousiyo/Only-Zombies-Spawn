@@ -52,6 +52,7 @@ val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata"
         "mod_credits" to JsonOutput.toJson(modCredits),
         "mod_entrypoint" to JsonOutput.toJson(modFabricEntrypoint),
         "mod_client_entrypoint" to JsonOutput.toJson(modFabricClientEntrypoint),
+        "mod_mixin_config" to JsonOutput.toJson("$modId.mixins.json"),
     )
     inputs.properties(replaceProperties)
     expand(replaceProperties)
