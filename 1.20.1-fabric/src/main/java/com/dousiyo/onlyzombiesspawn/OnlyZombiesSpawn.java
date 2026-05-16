@@ -7,6 +7,7 @@ public final class OnlyZombiesSpawn implements ModInitializer {
     @Override
     public void onInitialize() {
         SpawnWhitelistConfig.load(FabricLoader.getInstance().getConfigDir());
+        ServerConfigCommandRegistrar.register();
         Constants.LOGGER.info("Only Zombies Spawn initialized");
     }
 }

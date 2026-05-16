@@ -9,6 +9,7 @@ public final class OnlyZombiesSpawnMod {
     public OnlyZombiesSpawnMod() {
         SpawnWhitelistConfig.load(FMLPaths.CONFIGDIR.get());
         MinecraftForge.EVENT_BUS.register(new SpawnReplacementHandler());
+        MinecraftForge.EVENT_BUS.register(ServerConfigCommandRegistrar.class);
         Constants.LOGGER.info("Only Zombies Spawn is active.");
     }
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -105,8 +106,24 @@ public final class WhitelistConfigScreen extends net.minecraft.client.gui.screen
                 dimensions.add(trimmed);
             }
         }
-        SpawnWhitelistConfig.save(FMLPaths.CONFIGDIR.get(), this.allowedMobs, dimensions, parseMultiplier(this.zombieSpawnMultiplier));
+        int multiplier = parseMultiplier(this.zombieSpawnMultiplier);
+        if (!this.sendServerConfig(dimensions, multiplier)) {
+            SpawnWhitelistConfig.save(FMLPaths.CONFIGDIR.get(), this.allowedMobs, dimensions, multiplier);
+        }
         this.onClose();
+    }
+
+    private boolean sendServerConfig(Set<String> dimensions, int multiplier) {
+        if (this.minecraft.player == null || this.minecraft.player.connection == null) {
+            return false;
+        }
+        this.minecraft.player.connection.sendCommand("ozsconfig_apply " + encodeList(this.allowedMobs) + " " + encodeList(dimensions) + " " + multiplier);
+        return true;
+    }
+
+    private static String encodeList(Set<String> values) {
+        String joined = values.stream().sorted().collect(Collectors.joining(","));
+        return joined.isEmpty() ? "-" : joined;
     }
 
     private static int parseMultiplier(String value) {

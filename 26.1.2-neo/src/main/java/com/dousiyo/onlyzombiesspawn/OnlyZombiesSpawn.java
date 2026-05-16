@@ -16,5 +16,6 @@ public final class OnlyZombiesSpawn {
         }
         NeoForge.EVENT_BUS.addListener(SpawnReplacementHandler::onFinalizeSpawn);
         NeoForge.EVENT_BUS.addListener(SpawnReplacementHandler::onEntityJoinLevel);
+        NeoForge.EVENT_BUS.addListener(ServerConfigCommandRegistrar::registerCommands);
     }
 }

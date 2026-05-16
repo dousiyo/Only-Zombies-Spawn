@@ -15,7 +15,7 @@ public final class ClientConfigCommandRegistrar {
 
     @SubscribeEvent
     public static void registerClientCommands(RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("ozsconfig").executes(context -> openConfigScreen()));
+        event.getDispatcher().register(Commands.literal("ozsconfig").requires(source -> source.hasPermission(2)).executes(context -> openConfigScreen()));
     }
 
     private static int openConfigScreen() {

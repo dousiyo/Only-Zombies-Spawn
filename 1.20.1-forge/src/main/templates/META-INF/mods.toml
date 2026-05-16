@@ -11,6 +11,7 @@ displayURL="${mod_display_url}"
 #logoFile="${mod_id}.png"
 credits="${mod_credits}"
 authors="${mod_authors}"
+displayTest="IGNORE_SERVER_VERSION"
 description='''${mod_description}'''
 
 [[mixins]]
